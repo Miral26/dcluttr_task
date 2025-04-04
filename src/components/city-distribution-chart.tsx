@@ -68,7 +68,7 @@ const CityDistributionChart = ({
 
               return (
                 <path
-                  key={city.name}
+                  key={index}
                   d={pathData}
                   stroke={`url(#path-${index}-gradient)`}
                   strokeWidth="30"
@@ -90,8 +90,8 @@ const CityDistributionChart = ({
           </div>
         </div>
         <div className="space-y-2.5">
-          {cities.map((city) => (
-            <div key={city.name} className="flex items-center justify-between">
+          {cities.map((city,index) => (
+            <div key={city.name +index} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div
                   className="w-2 h-2 rounded-full"

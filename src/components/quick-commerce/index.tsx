@@ -1,6 +1,5 @@
 "use client";
 import DataTable from "../data-table";
-import CityDistributionChart from "../city-distribution-chart";
 import Image from "next/image";
 import SalesMrp from "../sales-mrp";
 import { ChartLine, Calendar, ChevronDown } from "lucide-react";
@@ -9,37 +8,9 @@ import { DayPicker, DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import "react-day-picker/dist/style.css";
 import SalesQuantity from "../sales-quantity";
+import TopCities from "../top-cities";
 
-const cityData = [
-  {
-    name: "New Delhi",
-    value: "68.2L",
-    percentage: "35%",
-    change: 2.2,
-    color: "#6C4FED",
-  },
-  {
-    name: "Mumbai",
-    value: "68.2L",
-    percentage: "23%",
-    change: 2.2,
-    color: "#EA6153",
-  },
-  {
-    name: "West Bengal",
-    value: "68.2L",
-    percentage: "23%",
-    change: 2.2,
-    color: "#F7C245",
-  },
-  {
-    name: "Others",
-    value: "68.2L",
-    percentage: "19%",
-    change: 2.2,
-    color: "#D9D9D9",
-  },
-];
+
 const QuickCommerce = () => {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -119,11 +90,7 @@ const QuickCommerce = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <SalesMrp />
           <SalesQuantity />
-          <CityDistributionChart
-            total="68.2L"
-            totalChange={2.2}
-            cities={cityData}
-          />
+          <TopCities />
         </div>
 
         <DataTable />
