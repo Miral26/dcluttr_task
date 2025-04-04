@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* set the font family Mulish */
+body {
+  font-family: var(--font-mulish);
+}
+
+/* set the font size to 14px */
+body {
+  font-size: 14px;
+}
+
