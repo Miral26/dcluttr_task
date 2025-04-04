@@ -10,34 +10,15 @@ interface TableData {
   id: string;
   name: string;
   sales: string;
-  outOfStock: string;
-  totalInventory: string;
-  averageRank: number;
-  estTraffic: number;
-  estImpressions: number;
+  percentage: string;
+  change: number;
   isExpanded?: boolean;
   [key: string]: string | number | boolean | TableData[] | undefined;
 }
 
 interface ApiResponseItem {
-  "blinkit_insights_sku.id": string;
-  "blinkit_insights_sku.name": string;
-  "blinkit_insights_sku.sales_mrp_sum": string;
-  "blinkit_insights_sku.qty_sold": string;
-  "blinkit_insights_sku.drr_7": string;
-  "blinkit_insights_sku.drr_14": string;
-  "blinkit_insights_sku.drr_30": string;
-  "blinkit_insights_sku.sales_mrp_max": string;
-  "blinkit_insights_sku.month_to_date_sales": string;
-  "blinkit_insights_sku.be_inv_qty": string;
-  "blinkit_insights_sku.fe_inv_qty": string;
-  "blinkit_insights_sku.inv_qty": string;
-  "blinkit_insights_sku.days_of_inventory_14": string;
-  "blinkit_insights_sku.days_of_inventory_max": string;
-  "blinkit_scraping_stream.on_shelf_availability": string | null;
-  "blinkit_scraping_stream.rank_avg": string | null;
-  "blinkit_scraping_stream.selling_price_avg": string | null;
-  "blinkit_scraping_stream.discount_avg": string | null;
+  "blinkit_insights_city.name": string;
+  "blinkit_insights_city.sales_mrp_sum": string;
 }
 
 type TableValue = string | number;
@@ -54,7 +35,7 @@ interface Column {
 const columns: Column[] = [
   {
     key: "name",
-    label: "SKU Name",
+    label: "City Name",
     sortable: true,
     className: "text-left min-w-[200px]",
     group: "main",
@@ -65,45 +46,26 @@ const columns: Column[] = [
     sortable: true,
     className: "text-center",
     render: (value) => <span className="font-medium">{value}</span>,
-    group: "availability",
+    group: "sales",
   },
   {
-    key: "outOfStock",
-    label: "Out of Stock",
+    key: "percentage",
+    label: "Percentage",
     className: "text-center",
-    group: "availability",
+    group: "sales",
     sortable: true,
   },
   {
-    key: "totalInventory",
-    label: "Total Inventory",
+    key: "change",
+    label: "Change",
     sortable: true,
     className: "text-center",
-    group: "availability",
-  },
-  {
-    key: "averageRank",
-    label: "Average Rank",
-    sortable: true,
-    className: "text-center",
-    render: (value) => Number(value).toFixed(1),
-    group: "visibility",
-  },
-  {
-    key: "estTraffic",
-    label: "Est. Traffic",
-    sortable: true,
-    className: "text-center",
-    render: (value) => Number(value).toLocaleString(),
-    group: "visibility",
-  },
-  {
-    key: "estImpressions",
-    label: "Est. Impressions",
-    sortable: true,
-    className: "text-center",
-    render: (value) => Number(value).toLocaleString(),
-    group: "visibility",
+    render: (value) => (
+      <span className={Number(value) >= 0 ? "text-green-600" : "text-red-600"}>
+        {Number(value) >= 0 ? "+" : ""}{Number(value).toFixed(1)}%
+      </span>
+    ),
+    group: "sales",
   },
 ];
 
@@ -127,7 +89,7 @@ const CustomCheckbox = ({
   </div>
 );
 
-export default function DataTable() {
+export default function CityDataTable() {
   const [data, setData] = useState<TableData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -146,64 +108,81 @@ export default function DataTable() {
           "https://amaranth-muskox.aws-us-east-1.cubecloudapp.dev/dev-mode/feat/frontend-hiring-task/cubejs-api/v1/load",
           {
             query: [
+              
               {
-                measures: [
-                  "blinkit_insights_sku.sales_mrp_sum",
-                  "blinkit_insights_sku.qty_sold",
-                  "blinkit_insights_sku.drr_7",
-                  "blinkit_insights_sku.drr_14",
-                  "blinkit_insights_sku.drr_30",
-                  "blinkit_insights_sku.sales_mrp_max",
-                  "blinkit_insights_sku.month_to_date_sales",
-                  "blinkit_insights_sku.be_inv_qty",
-                  "blinkit_insights_sku.fe_inv_qty",
-                  "blinkit_insights_sku.inv_qty",
-                  "blinkit_insights_sku.days_of_inventory_14",
-                  "blinkit_insights_sku.days_of_inventory_max",
-                  "blinkit_scraping_stream.on_shelf_availability",
-                  "blinkit_scraping_stream.rank_avg",
-                  "blinkit_scraping_stream.selling_price_avg",
-                  "blinkit_scraping_stream.discount_avg"
-                ],
-                dimensions: [
-                  "blinkit_insights_sku.id",
-                  "blinkit_insights_sku.name"
-                ],
+                measures: ["blinkit_insights_city.sales_mrp_sum"],
+                dimensions: ["blinkit_insights_city.name"],
                 timeDimensions: [
                   {
-                    dimension: "blinkit_insights_sku.created_at",
-                    dateRange: "Last month",
-                    granularity: "day"
-                  }
+                    dimension: "blinkit_insights_city.created_at",
+                    dateRange: "last month",
+                    granularity: "day",
+                  },
                 ],
-                limit: 100
-              }
+                order: {
+                  "blinkit_insights_city.sales_mrp_sum": "desc",
+                },
+                limit: 100,
+              },{
+                measures: ["blinkit_insights_city.sales_mrp_sum"],
+                dimensions: ["blinkit_insights_city.name"],
+                timeDimensions: [
+                  {
+                    dimension: "blinkit_insights_city.created_at",
+                    dateRange: "2025-02-01T00:00:00.000, 2025-02-28T23:59:59.999",
+                    granularity: "day",
+                  },
+                ],
+                order: {
+                  "blinkit_insights_city.sales_mrp_sum": "desc",
+                },
+                limit: 100,
+              },
             ],
-            queryType: "multi"
+            queryType: "multi",
           }
         );
 
-        const rawData = response.data.results[0].data;
-        const formattedData = rawData.map((item: ApiResponseItem) => ({
-          id: item["blinkit_insights_sku.id"],
-          name: item["blinkit_insights_sku.name"],
-          sales: `₹${Number(item["blinkit_insights_sku.sales_mrp_sum"]).toLocaleString()}`,
-          outOfStock: item["blinkit_scraping_stream.on_shelf_availability"] 
-            ? `${(100 - Number(item["blinkit_scraping_stream.on_shelf_availability"])).toFixed(2)}%`
-            : "N/A",
-          totalInventory: item["blinkit_insights_sku.inv_qty"],
-          averageRank: item["blinkit_scraping_stream.rank_avg"] 
-            ? Number(item["blinkit_scraping_stream.rank_avg"])
-            : 0,
-          estTraffic: Number(item["blinkit_insights_sku.qty_sold"]),
-          estImpressions: Number(item["blinkit_insights_sku.month_to_date_sales"]),
-        }));
+        const thisMonthData = response.data.results[0].data;
+        const lastMonthData = response.data.results[1].data;
+
+        // Calculate total sales for this month
+        const totalSales = thisMonthData.reduce(
+          (sum: number, item: ApiResponseItem) =>
+            sum + Number(item["blinkit_insights_city.sales_mrp_sum"]),
+          0
+        );
+
+        // Format the data for the table
+        const formattedData = thisMonthData.map((item: ApiResponseItem, index: number) => {
+          const sales = Number(item["blinkit_insights_city.sales_mrp_sum"]);
+          const percentage = ((sales / totalSales) * 100).toFixed(1);
+          
+          // Find corresponding last month data for this city
+          const lastMonthItem = lastMonthData.find(
+            (lastItem: ApiResponseItem) =>
+              lastItem["blinkit_insights_city.name"] === item["blinkit_insights_city.name"]
+          );
+          
+          const lastMonthSales = lastMonthItem 
+            ? Number(lastMonthItem["blinkit_insights_city.sales_mrp_sum"]) 
+            : 0;
+          const change = ((sales - lastMonthSales) / lastMonthSales) * 100;
+
+          return {
+            id: index.toString(),
+            name: item["blinkit_insights_city.name"],
+            sales: `₹${(sales / 100000).toFixed(1)}L`,
+            percentage: `${percentage}%`,
+            change: parseFloat(change.toFixed(1)),
+          };
+        });
 
         setData(formattedData);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching SKU data:", error);
-        setError("Failed to fetch SKU data");
+        console.error("Error fetching city data:", error);
+        setError("Failed to fetch city data");
         setLoading(false);
       }
     };
@@ -285,8 +264,8 @@ export default function DataTable() {
     <div>
       <div className="flex items-center justify-between p-4 border-b border-[#EBEBEB]">
         <div>
-          <h2 className="text-[#031B15] font-medium">SKU level data</h2>
-          <p className="text-sm text-[#7D7D7E]">Analytics for all your SKUs</p>
+          <h2 className="text-[#031B15] font-medium">City level data</h2>
+          <p className="text-sm text-[#7D7D7E]">Analytics for all cities</p>
         </div>
         <button className="px-4 py-2 bg-[#00875A] text-white rounded-lg text-sm flex items-center gap-2">
           Filters(1)
@@ -319,20 +298,14 @@ export default function DataTable() {
                         fill="#515153"
                       />
                     </svg>
-                    SKU Name
+                    City Name
                   </div>
                 </th>
                 <th
                   colSpan={3}
                   className="p-4 text-center text-sm font-medium text-[#515153] border-l border-[#EBEBEB]"
                 >
-                  Availability
-                </th>
-                <th
-                  colSpan={4}
-                  className="p-4 text-center text-sm font-medium text-[#515153] border-l border-[#EBEBEB]"
-                >
-                  Visibility
+                  Sales Metrics
                 </th>
               </tr>
               <tr className="border-b border-[#EBEBEB]">
@@ -343,10 +316,6 @@ export default function DataTable() {
                       key={column.key}
                       className={`p-4 text-sm font-medium text-[#515153] ${
                         column.className
-                      } ${
-                        column.group === "visibility"
-                          ? "border-l border-[#EBEBEB] first:border-l-0"
-                          : ""
                       }`}
                     >
                       <div
@@ -457,4 +426,4 @@ export default function DataTable() {
       </div>
     </div>
   );
-}
+} 

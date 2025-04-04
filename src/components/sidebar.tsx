@@ -108,7 +108,7 @@ const Sidebar = () => {
           <nav className="flex-1 p-3 bg-[#F8F8F8]">
             <ul className="space-y-1">
               {menuItems.map((item, index) => (
-                <li key={index}>
+                <li key={item.label}>
                   {!item.subItems ? (
                     <Link href={item.href} className={`flex items-center gap-3 px-3 py-2 text-[#031B15] rounded-lg hover:bg-gray-100 ${item.subItems ? "mb-1" : ""}`}>
                       {item.icon}

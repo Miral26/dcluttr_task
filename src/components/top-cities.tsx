@@ -15,9 +15,6 @@ interface ApiResponseItem {
   "blinkit_insights_city.sales_mrp_sum": string;
 }
 
-interface ApiResponse {
-  data: ApiResponseItem[];
-}
 
 const COLORS = ["#6C4FED", "#EA6153", "#F7C245", "#D9D9D9"];
 

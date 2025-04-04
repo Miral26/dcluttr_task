@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import "react-day-picker/dist/style.css";
 import SalesQuantity from "../sales-quantity";
 import TopCities from "../top-cities";
+import CityDataTable from "../city-data-table";
 
 
 const QuickCommerce = () => {
@@ -94,6 +95,7 @@ const QuickCommerce = () => {
         </div>
 
         <DataTable />
+        <CityDataTable />
       </div>
     </>
   );

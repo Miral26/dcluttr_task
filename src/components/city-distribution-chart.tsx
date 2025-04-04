@@ -68,7 +68,7 @@ const CityDistributionChart = ({
 
               return (
                 <path
-                  key={index}
+                  key={city.name}
                   d={pathData}
                   stroke={`url(#path-${index}-gradient)`}
                   strokeWidth="30"
